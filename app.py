@@ -50,7 +50,7 @@ st.info(
 )
 st.sidebar.title("About")
 st.sidebar.write("Ask questions on technology, AI, programming, data science, and general knowledge.")
-
+st.write(os.path.exists("robot_ai.jpg"))
 image_path = "robot_ai.jpg"
 if os.path.exists(image_path):
     try:
