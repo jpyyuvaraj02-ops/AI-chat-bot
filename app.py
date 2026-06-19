@@ -94,11 +94,20 @@ st.sidebar.write("🎨 Streamlit")
 # -----------------------------
 @st.cache_resource
 def load_vectorstore():
+    # Use absolute path to handle different working directories (local vs Streamlit Cloud)
+    data_path = os.path.join(os.path.dirname(__file__), "data.txt")
+    if not os.path.exists(data_path):
+        st.error("data.txt file not found at {}".format(data_path))
+        st.stop()
 
     documents = []
 
-    text_loader = TextLoader("data.txt")
-    documents.extend(text_loader.load())
+    try:
+        text_loader = TextLoader(data_path)
+        documents.extend(text_loader.load())
+    except Exception as exc:
+        st.error(f"Failed to load data.txt: {exc}")
+        st.stop()
 
     splitter = CharacterTextSplitter(
         chunk_size=300,

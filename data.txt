@@ -27,3 +27,6 @@ FAISS is a vector database library developed by Meta for similarity search.
 
 Cyber Security:
 Cyber Security protects systems, networks, and data from attacks.
+
+Tamil Nadu CM:
+Tamil Nadu's incumbent Chief Minister is C. Joseph Vijay, founder of the Tamilaga Vettri Kazhagam (TVK) party. He assumed office on May 10, 2026, marking a historic shift as the first leader from a non-Dravidian party to head the state government since 1967
