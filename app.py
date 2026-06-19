@@ -51,12 +51,12 @@ st.info(
 st.sidebar.title("About")
 st.sidebar.write("Ask questions on technology, AI, programming, data science, and general knowledge.")
 
-image_path = "robot_ai.jpg.png"
+image_path = "robot_ai.jpg"
 if os.path.exists(image_path):
     try:
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
-            st.image(image_path, width=400)
+            st.image("robot_ai.jpg", width=400)
     except Exception:
         st.warning("Unable to load local image. Using fallback image.")
         st.image(
