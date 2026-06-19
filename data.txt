@@ -1,41 +1,29 @@
-XYZ Engineering College Information
+Artificial Intelligence (AI):
+AI is the simulation of human intelligence by machines.
 
-College Timings:
-The college starts at 9:00 AM and ends at 4:00 PM.
+Machine Learning:
+Machine Learning is a subset of AI that enables systems to learn from data.
 
-Departments:
-Computer Science Engineering (CSE)
-Electronics and Communication Engineering (ECE)
-Mechanical Engineering
-Civil Engineering
-Information Technology (IT)
+Python:
+Python is a high-level programming language widely used in AI, Data Science, and Web Development.
 
-Library:
-The library is located in Block A on the first floor.
-Library timings are 9:30 AM to 5:00 PM.
+Data Science:
+Data Science involves collecting, analyzing, and interpreting data to extract insights.
 
-Hackathon Event:
-A 24 hour hackathon will be conducted on March 15 in the seminar hall.
+GitHub:
+GitHub is a platform used for version control and collaboration.
 
-Placement Cell:
-The placement cell is located in Block C.
-Placement training sessions are conducted every Friday.
+RAG:
+Retrieval Augmented Generation combines information retrieval with large language models.
 
-Canteen:
-The canteen is located near the main ground.
+Streamlit:
+Streamlit is a Python framework used to build web applications quickly.
 
-WiFi:
-Free campus wifi is available for all students.
+LangChain:
+LangChain is a framework for building applications powered by language models.
 
-Hostel:
-The boys hostel is located behind Block D.
-The girls hostel is located near the sports ground.
+FAISS:
+FAISS is a vector database library developed by Meta for similarity search.
 
-Sports:
-The campus has a football ground, basketball court, and indoor stadium.
-
-Auditorium:
-A central auditorium with seating capacity of 1000 is available for events.
-
-Contact:
-For student support contact studentaffairs@xyzcollege.com
+Cyber Security:
+Cyber Security protects systems, networks, and data from attacks.
