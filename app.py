@@ -57,17 +57,8 @@ if os.path.exists(image_path):
         col1, col2, col3 = st.columns([1, 2, 1])
         with col2:
             st.image( "robot_ai.jpg.png", width=400)
-    except Exception:
-        st.warning("Unable to load local image. Using fallback image.")
-        st.image(
-            "https://images.unsplash.com/photo-1677442136019-21780ecad995",
-            use_container_width=True,
-        )
-else:
-    st.image(
-        "https://images.unsplash.com/photo-1677442136019-21780ecad995",
-        use_container_width=True,
-    )
+    except Exception as e:
+        st.error(f"Error loading image: {e}")
 st.sidebar.title("⚡ AI Assistant")
 
 st.sidebar.success("🟢 Online")
