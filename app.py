@@ -6,6 +6,10 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from groq import Groq
+try:
+    from duckduckgo_search import DDGS # pyright: ignore[reportMissingImports]
+except ImportError:
+    DDGS = None
 
 # Load environment variables
 load_dotenv()
@@ -84,6 +88,14 @@ st.sidebar.write("🎨 Streamlit")
 # Load and cache vector database
 # -----------------------------
 @st.cache_resource
+def search_web(query):
+    results = []
+
+    with DDGS() as ddgs:
+        for r in ddgs.text(query, max_results=3):
+            results.append(r["body"])
+
+    return "\n".join(results)
 def load_vectorstore():
     # Use absolute path to handle different working directories (local vs Streamlit Cloud)
     data_path = os.path.join(os.path.dirname(__file__), "data.txt")
@@ -143,7 +155,17 @@ if prompt:
         st.write(prompt)
 
     docs = retriever.invoke(prompt)
-    context = "\n\n".join([d.page_content for d in docs[:3]])
+    rag_context = "\n\n".join([d.page_content for d in docs[:3]])
+
+    web_context = search_web(prompt)
+
+    context = f"""
+RAG Knowledge:
+{rag_context}
+
+Latest Web Information:
+{web_context}
+"""
     full_prompt = f"""
 You are an AI Knowledge Assistant.
 
@@ -151,8 +173,14 @@ Never mention XYZ Engineering College or any college.
 
 Answer questions about AI, Programming, Technology, Data Science and General Knowledge.
 
-Use the context when relevant.
-If context is not enough, use your general knowledge.
+Use the provided RAG knowledge and latest web information.
+
+Priority:
+1. Latest Web Information
+2. RAG Knowledge
+3. General Knowledge
+
+Give accurate and updated answers.
 
 Context:
 {context}
@@ -187,5 +215,5 @@ Answer:
         })
 
     with st.chat_message("assistant"):
-            st.write(answer)
+        st.write(answer)
         

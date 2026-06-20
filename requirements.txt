@@ -7,3 +7,4 @@ sentence-transformers
 groq
 python-dotenv
 pypdf
+duckduckgo-search
