@@ -382,7 +382,6 @@ Answer:
             )
 
             answer = chat.choices[0].message.content
-
         except groq.RateLimitError as e:
             # Handle Groq rate limit gracefully and fallback to RAG-only answer
             rate_limited = True
@@ -397,10 +396,12 @@ Answer:
                     "I'm temporarily unable to reach the web-model due to rate limits. "
                     "Providing information from my RAG knowledge:\n\n" + rag_context
                 )
+        except Exception:
+            answer = """
+⚠️ AI service is temporarily busy.
 
-        except Exception as e:
-            st.error(f"API error: {e}")
-            answer = "Sorry, I'm temporarily unable to process that request. Please try again later."
+Please try again after a few minutes.
+"""
 
         st.session_state.messages.append({
             "role": "assistant",
