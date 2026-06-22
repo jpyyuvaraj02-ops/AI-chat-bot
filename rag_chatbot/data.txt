@@ -1,0 +1,29 @@
+Artificial Intelligence (AI):
+AI is the simulation of human intelligence by machines.
+
+Machine Learning:
+Machine Learning is a subset of AI that enables systems to learn from data.
+
+Python:
+Python is a high-level programming language widely used in AI, Data Science, and Web Development.
+
+Data Science:
+Data Science involves collecting, analyzing, and interpreting data to extract insights.
+
+GitHub:
+GitHub is a platform used for version control and collaboration.
+
+RAG:
+Retrieval Augmented Generation combines information retrieval with large language models.
+
+Streamlit:
+Streamlit is a Python framework used to build web applications quickly.
+
+LangChain:
+LangChain is a framework for building applications powered by language models.
+
+FAISS:
+FAISS is a vector database library developed by Meta for similarity search.
+
+Cyber Security:
+Cyber Security protects systems, networks, and data from attacks.
