@@ -5,6 +5,7 @@ from langchain_community.document_loaders import TextLoader
 from langchain_text_splitters import CharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
+import groq
 from groq import Groq
 
 # Load environment variables
@@ -160,6 +161,7 @@ for msg in st.session_state.messages:
 prompt = st.chat_input("💬 Ask your question here...")
 
 if prompt:
+    prompt_lower = prompt.lower().strip()
     st.session_state.messages.append({
     "role": "user",
     "content": prompt
@@ -173,7 +175,7 @@ if prompt:
     ]
 
     is_greeting = any(
-        prompt.lower().strip().startswith(g)
+        prompt_lower.startswith(g)
         for g in greetings
     )
     casual_keywords = [
@@ -183,8 +185,10 @@ if prompt:
         "hey",
         "how are you",
         "tell me about yourself",
+        "tell me about your self",
         "who are you",
         "who made you",
+        "who developed you",
         "owner",
         "creator",
         "developer",
@@ -196,7 +200,7 @@ if prompt:
     ]
 
     is_casual = any(
-        word in prompt.lower()
+        word in prompt_lower
         for word in casual_keywords
     )
     owner_keywords = [
@@ -204,10 +208,15 @@ if prompt:
     "who created you",
     "your owner",
     "tell me about yourself",
-    "introduce yourself"
+    "tell me about your self",
+    "introduce yourself",
+    "who developed you",
+    "who are you"
+
+
 ]
 
-    if any(k in prompt.lower() for k in owner_keywords):
+    if any(k in prompt_lower for k in owner_keywords):
 
         answer = """
     Hello! 👋
@@ -247,24 +256,48 @@ if prompt:
     ]
     
     is_tech = any(
-        keyword in prompt.lower()
+        keyword in prompt_lower
         for keyword in tech_keywords
+    )
+    current_affairs_keywords = [
+        "pm",
+        "prime minister",
+        "cm",
+        "chief minister",
+        "president",
+        "governor",
+        "minister",
+        "election",
+        "ipl",
+        "world cup",
+        "winner",
+        "score",
+        "today",
+        "latest",
+        "current"
+    ]
+
+    is_current_affair = any(
+        word in prompt_lower
+        for word in current_affairs_keywords
     )
     
     # General Knowledge = NOT technical and NOT casual
-    need_web = not is_tech and not is_casual 
-
+    need_web = (
+    is_current_affair
+    or (not is_tech and not is_casual)
+)
     if is_casual:
         web_context = ""
         sources = []
     else:
         if need_web:
-             web_context, sources = search_web(prompt)
+            web_context, sources = search_web(prompt)
             
         else:
             web_context = ""
             sources = []
-
+    
     docs = retriever.invoke(prompt)
     rag_context = "\n\n".join([d.page_content for d in docs[:3]])
 
@@ -302,6 +335,19 @@ For technical questions:
 - Use bullet points.
 - Give examples.
 - If learning roadmap is asked, provide beginner to advanced roadmap.
+IMPORTANT:
+
+- If Web Information exists, ignore RAG Knowledge for current affairs.
+- Current affairs include PM, CM, President, Elections, Sports results and Government positions.
+- Never combine Web Information and RAG Knowledge.
+- Give only one final answer.
+- Do not say "According to RAG Knowledge".
+- Do not mention conflicting information.
+Rules:
+- For political positions, PM, CM, President, Ministers and current affairs,
+  ALWAYS use Web Information.
+- Ignore RAG Knowledge if it conflicts with Web Information.
+- Web Information has higher priority than RAG Knowledge.
   
 
 RAG Knowledge:
@@ -315,25 +361,46 @@ Question:
 
 Answer:
 """
-    messages = []
-
-    for m in st.session_state.messages:
-        messages.append({
+    messages = [
+        {
             "role": m["role"],
             "content": m["content"]
-        })
+        }
+        for m in st.session_state.messages[-10:]
+    ]
 
     messages.append({
         "role": "user",
         "content": full_prompt
     })
     with st.spinner("🤖 AI is thinking..."):
-        chat = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
-            messages=messages
-        )
+        rate_limited = False
+        try:
+            chat = client.chat.completions.create(
+                model="llama-3.3-70b-versatile",
+                messages=messages
+            )
 
-        answer = chat.choices[0].message.content
+            answer = chat.choices[0].message.content
+
+        except groq.RateLimitError as e:
+            # Handle Groq rate limit gracefully and fallback to RAG-only answer
+            rate_limited = True
+            st.error("Groq rate limit reached: using RAG-only fallback. Please try again later or upgrade your Groq plan.")
+            if need_web:
+                answer = (
+                    "I'm temporarily unable to perform web searches due to API rate limits. "
+                    "Here's what I can share from my internal (RAG) knowledge:\n\n" + rag_context
+                )
+            else:
+                answer = (
+                    "I'm temporarily unable to reach the web-model due to rate limits. "
+                    "Providing information from my RAG knowledge:\n\n" + rag_context
+                )
+
+        except Exception as e:
+            st.error(f"API error: {e}")
+            answer = "Sorry, I'm temporarily unable to process that request. Please try again later."
 
         st.session_state.messages.append({
             "role": "assistant",
@@ -342,7 +409,9 @@ Answer:
 
         with st.chat_message("assistant"):
             st.write(answer)
-            if sources:
-               with st.expander("🔗 Sources"):
-                    for s in sources[:3]:
-                      st.markdown(f"🔗 [{s}]({s})")
+
+        # Only show web sources when a live web search was used and we're not rate-limited
+        if not rate_limited and sources and need_web and not is_casual:
+            st.markdown("### 🔗 Sources")
+            for s in sources[:3]:
+                st.markdown(f"🔗 [{s}]({s})")
