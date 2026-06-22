@@ -179,26 +179,28 @@ if prompt:
         for g in greetings
     )
     casual_keywords = [
-        "hi",
-        "hello",
-        "hii",
-        "hey",
-        "how are you",
-        "tell me about yourself",
-        "tell me about your self",
-        "who are you",
-        "who made you",
-        "who developed you",
-        "owner",
-        "creator",
-        "developer",
-        "thank you",
-        "thanks",
-        "ok",
-        "okay",
-        "super"
-    ]
-
+    "hi",
+    "hello",
+    "hii",
+    "hey",
+    "how are you",
+    "tell me about yourself",
+    "tell me about your self",
+    "who are you",
+    "who made you",
+    "who developed you",
+    "your owner",
+    "owner",
+    "creator",
+    "developer",
+    "thank you",
+    "thanks",
+    "ok",
+    "okay",
+    "super",
+    "tq",
+    "nice"
+]
     is_casual = any(
         word in prompt_lower
         for word in casual_keywords
@@ -206,14 +208,12 @@ if prompt:
     owner_keywords = [
     "who made you",
     "who created you",
+    "who developed you",
     "your owner",
     "tell me about yourself",
     "tell me about your self",
     "introduce yourself",
-    "who developed you",
     "who are you"
-
-
 ]
 
     if any(k in prompt_lower for k in owner_keywords):
@@ -406,12 +406,21 @@ Answer:
             "role": "assistant",
             "content": answer
         })
+        show_sources = (
+    sources
+    and need_web
+    and not is_casual
+    and not any(
+        k in prompt.lower()
+        for k in owner_keywords
+    )
+)
 
         with st.chat_message("assistant"):
             st.write(answer)
 
         # Only show web sources when a live web search was used and we're not rate-limited
-        if not rate_limited and sources and need_web and not is_casual:
-            st.markdown("### 🔗 Sources")
-            for s in sources[:3]:
-                st.markdown(f"🔗 [{s}]({s})")
+        if show_sources:
+           st.markdown("### 🔗 Sources")
+           for s in sources[:3]:
+              st.markdown(f"🔗 [{s}]({s})")
